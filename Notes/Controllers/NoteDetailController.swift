@@ -2,7 +2,7 @@
 //  NoteDetailController.swift
 //  Notes
 //
-//  Created by Max Nelson on 3/15/19.
+//  Created by Max Nelson on 3/16/19.
 //  Copyright © 2019 Maxcodes. All rights reserved.
 //
 
@@ -10,12 +10,22 @@ import UIKit
 
 class NoteDetailController: UIViewController {
     
+    var note:Note? {
+        didSet {
+            guard let note = self.note else { return }
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM dd, yyyy"
+            
+            dateLabel.text = dateFormatter.string(from: note.date)
+            textView.text = note.text
+        }
+    }
+    
     fileprivate var textView: UITextView = {
         let textView = UITextView()
         textView.text = "Notes go in here"
         textView.isEditable = true
         textView.font = UIFont.systemFont(ofSize: 18, weight: UIFont.Weight.regular)
-//        textView.backgroundColor = UIColor.primaryColor.withAlphaComponent(0.5)
         return textView
     }()
     
@@ -37,7 +47,8 @@ class NoteDetailController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated);
+        super.viewWillAppear(animated)
+        
         
         let items:[UIBarButtonItem] = [
             UIBarButtonItem(barButtonSystemItem: .organize, target: nil, action: nil),

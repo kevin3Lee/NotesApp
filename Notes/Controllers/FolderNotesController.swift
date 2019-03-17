@@ -11,12 +11,21 @@ import UIKit
 
 class FolderNotesController: UITableViewController {
     
+    var noteFolder:NoteFolder! {
+        didSet {
+            self.navigationItem.title = noteFolder.title
+            self.notes = noteFolder.notes
+        }
+    }
+    
+    var notes:[Note] = []
+    
     fileprivate let CELL_ID = "CELL_ID"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.navigationItem.title = "Folder Notes"
+//        self.navigationItem.title = "Folder Notes"
         setupTableView()
     }
     
@@ -48,16 +57,19 @@ class FolderNotesController: UITableViewController {
 extension FolderNotesController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CELL_ID, for: indexPath) as! NoteCell
-//        cell.textLabel?.text = "note"
+        let note = notes[indexPath.row]
+        cell.note = note
         return cell
     }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let folderDetailsController = NoteDetailController()
+        let note = notes[indexPath.row]
+        folderDetailsController.note = note
         navigationController?.pushViewController(folderDetailsController, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 16
+        return notes.count
     }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60

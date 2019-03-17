@@ -10,6 +10,18 @@ import UIKit
 
 class NoteCell: UITableViewCell {
     
+    var note:Note! {
+        didSet {
+            noteTitle.text = note.title
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM dd, yyyy"
+            
+            dateLabel.text = dateFormatter.string(from: note.date)
+            previewLabel.text = note.text
+        }
+    }
+    
     fileprivate var noteTitle:UILabel = {
         let label = UILabel()
         label.text = "Places to create JPEGs"

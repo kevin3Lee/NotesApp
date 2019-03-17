@@ -8,6 +8,22 @@
 
 import UIKit
 
+let notes = [
+    Note(title: "Table Views", date: Date(), text: "table views use protocols to recieve data."),
+    Note(title: "Collection Views", date: Date(), text: "collection views can be customized with flow layouts to create layouts like you see in the Pinterest app."),
+    Note(title: "Flow Layouts", date: Date(), text: "custom layouts can be made with UICollectionViewFlowLayout"),
+]
+
+let notesTwo = [
+    Note(title: "Instagram", date: Date(), text: "I have two instagram accounts. Maxcodes and maxcodes.io"),
+    Note(title: "YouTube Channels", date: Date(), text: "I also have two youtube channels. One for iOS development videos, another for dev vlogs.s"),
+]
+
+var noteFolders:[NoteFolder] = [
+    NoteFolder(title: "Course Notes", notes: notes),
+    NoteFolder(title: "Social Media", notes: notesTwo)
+]
+
 class FoldersController: UITableViewController {
     
     fileprivate let CELL_ID = "CELL_ID"
@@ -25,6 +41,7 @@ class FoldersController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         
         setupTableView()
     }
@@ -69,18 +86,20 @@ class FoldersController: UITableViewController {
 extension FoldersController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: CELL_ID, for: indexPath) as! FolderCell
-//        cell.textLabel?.text = "note"
+        let noteFolderForRow = noteFolders[indexPath.row]
+        cell.noteFolder = noteFolderForRow
         cell.accessoryType = .disclosureIndicator
-//        cell.addBorder(toSide: .bottom, withColor: UIColor.lightGray.withAlphaComponent(0.5).cgColor, andThickness: 0.3)
         return cell
     }
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let folderDetailsController = FolderNotesController()
+        let noteFolderForRow = noteFolders[indexPath.row]
+        folderDetailsController.noteFolder = noteFolderForRow
         navigationController?.pushViewController(folderDetailsController, animated: true)
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 16
+        return noteFolders.count
     }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
