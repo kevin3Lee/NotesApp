@@ -57,11 +57,20 @@ class FolderNotesController: UITableViewController {
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
             UIBarButtonItem(title: "5 Notes", style: .plain, target: nil, action: nil),
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(barButtonSystemItem: .compose, target: nil, action: nil)
+            UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(self.handleWriteNewNote))
         ]
         self.toolbarItems = items
         
         self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .edit, target: nil, action: nil), animated: false)
+    }
+    
+    @objc fileprivate func handleWriteNewNote() {
+        pushNoteDetail()
+    }
+    
+    fileprivate func pushNoteDetail() {
+        let folderDetailsController = NoteDetailController()
+        navigationController?.pushViewController(folderDetailsController, animated: true)
     }
 }
 
@@ -90,9 +99,6 @@ extension FolderNotesController: UISearchBarDelegate {
         tableView.reloadData()
     }
     
-    
-
-    
 }
 
 
@@ -106,6 +112,7 @@ extension FolderNotesController {
         cell.note = note
         return cell
     }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let folderDetailsController = NoteDetailController()
         let note = notes[indexPath.row]
@@ -119,4 +126,30 @@ extension FolderNotesController {
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 60
     }
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+            print("delete logic goes here")
+//            if var currentFolder = noteFolders.first(where: { $0.notes == self.notes }) {
+//
+//                currentFolder.notes.remove(at: indexPath.row)
+//            }
+          self.filteredNotes.remove(at: indexPath.row)
+          self.notes.remove(at: indexPath.row)
+          tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            
+            if let target = noteFolders.firstIndex(where: { (noteFolder) -> Bool in
+                return noteFolder == self.noteFolder
+            }) {
+                noteFolders[target].notes = self.notes
+            }
+
+            
+     
+      
+            
+        }
+        return [deleteAction]
+    }
 }
+

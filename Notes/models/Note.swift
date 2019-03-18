@@ -8,7 +8,10 @@
 
 import Foundation
 
-struct Note {
+struct Note: Equatable {
+    static func == (lhs: Note, rhs: Note) -> Bool {
+        return lhs.title == rhs.title && lhs.date == rhs.date && lhs.text == rhs.text
+    }
     var title:String!
     var date:Date!
     var text:String!

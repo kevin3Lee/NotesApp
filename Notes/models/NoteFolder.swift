@@ -8,7 +8,11 @@
 
 import Foundation
 
-struct NoteFolder {
+struct NoteFolder: Equatable {
+    static func == (lhs: NoteFolder, rhs: NoteFolder) -> Bool {
+        return lhs.title == rhs.title && lhs.notes == rhs.notes
+    }
+    
     var title:String
     var notes:[Note]
 }

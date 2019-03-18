@@ -45,10 +45,16 @@ class FoldersController: UITableViewController {
         
         setupTableView()
     }
+
     
     fileprivate func setupTableView() {
         tableView.register(FolderCell.self, forCellReuseIdentifier: CELL_ID)
         tableView.tableHeaderView = headerView
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        tableView.reloadData()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -60,13 +66,41 @@ class FoldersController: UITableViewController {
         
         let items:[UIBarButtonItem] = [
             UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil),
-            UIBarButtonItem(title: "New Folder", style: .done, target: nil, action: nil)
+            UIBarButtonItem(title: "New Folder", style: .done, target: self, action: #selector(self.handleAddNewFolder))
         ]
         self.toolbarItems = items
         
         self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .edit, target: nil, action: nil), animated: false)
         
         setupTranslucentViews()
+    }
+    
+    @objc fileprivate func handleAddNewFolder() {
+        let addAlert = UIAlertController(title: "New Folder", message: "Enter a name for this folder.", preferredStyle: .alert)
+
+        addAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (_) in
+            addAlert.dismiss(animated: true, completion: nil)
+        }))
+        
+        
+        var newTitleField:UITextField!
+        
+        addAlert.addTextField { (tf) in
+            newTitleField = tf
+        }
+        
+        addAlert.addAction(UIAlertAction(title: "Save", style: .default, handler: { (_) in
+            addAlert.dismiss(animated: true, completion: {
+
+            })
+            guard let title = newTitleField.text else { return }
+            print(newTitleField)
+            let newFolder = NoteFolder(title: title, notes: [])
+            noteFolders.append(newFolder)
+            self.tableView.insertRows(at: [IndexPath(row: noteFolders.count - 1, section: 0)], with: .fade)
+        }))
+        
+        present(addAlert, animated: true, completion: nil)
     }
     
     fileprivate func setupTranslucentViews() {
@@ -103,5 +137,13 @@ extension FoldersController {
     }
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50
+    }
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (action, indexPath) in
+            print("delete logic goes here")
+            noteFolders.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+        return [deleteAction]
     }
 }
