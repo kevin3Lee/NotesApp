@@ -16,11 +16,21 @@ class FolderNotesController: UITableViewController {
             self.navigationItem.title = noteFolder.title
             self.notes = noteFolder.notes
             self.filteredNotes = noteFolder.notes
+            if let target = noteFolders.firstIndex(where: { (noteFolder) -> Bool in
+                return noteFolder == self.noteFolder
+            }) {
+                noteFolders[target].notes = self.notes
+                self.folderIndex = target
+            }
+         
         }
     }
+
     
+    var folderIndex:Int = -1
     var notes:[Note] = []
     var filteredNotes:[Note] = []
+    
     fileprivate var cachedText:String = ""
     
     fileprivate let CELL_ID = "CELL_ID"
@@ -64,12 +74,30 @@ class FolderNotesController: UITableViewController {
         self.navigationItem.setRightBarButton(UIBarButtonItem(barButtonSystemItem: .edit, target: nil, action: nil), animated: false)
     }
     
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        let updatedFolder = noteFolders[folderIndex]
+        if updatedFolder.notes.count > noteFolder.notes.count {
+            noteFolder = updatedFolder
+            let newIndexPath = IndexPath(row: noteFolder.notes.count - 1, section: 0)
+            tableView.insertRows(at: [newIndexPath], with: .fade)
+        } else {
+            noteFolder = updatedFolder
+            tableView.reloadData()
+        }
+
+
+    }
+    
+    
     @objc fileprivate func handleWriteNewNote() {
         pushNoteDetail()
     }
     
     fileprivate func pushNoteDetail() {
         let folderDetailsController = NoteDetailController()
+        folderDetailsController.noteFolderIndex = folderIndex
         navigationController?.pushViewController(folderDetailsController, animated: true)
     }
 }
@@ -117,6 +145,7 @@ extension FolderNotesController {
         let folderDetailsController = NoteDetailController()
         let note = notes[indexPath.row]
         folderDetailsController.note = note
+        folderDetailsController.noteFolderIndex = folderIndex
         navigationController?.pushViewController(folderDetailsController, animated: true)
     }
     
@@ -136,15 +165,15 @@ extension FolderNotesController {
           self.filteredNotes.remove(at: indexPath.row)
           self.notes.remove(at: indexPath.row)
           tableView.deleteRows(at: [indexPath], with: .fade)
-            
-            
-            if let target = noteFolders.firstIndex(where: { (noteFolder) -> Bool in
-                return noteFolder == self.noteFolder
-            }) {
-                noteFolders[target].notes = self.notes
-            }
+        
+//            if let target = noteFolders.firstIndex(where: { (noteFolder) -> Bool in
+//                return noteFolder == self.noteFolder
+//            }) {
+//                noteFolders[target].notes = self.notes
+//            }
 
             
+            noteFolders[self.folderIndex].notes = self.notes
      
       
             

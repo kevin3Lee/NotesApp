@@ -10,6 +10,8 @@ import UIKit
 
 class NoteDetailController: UIViewController {
     
+    var noteFolderIndex = -1
+    
     var note:Note? {
         didSet {
             guard let note = self.note else { return }
@@ -69,6 +71,26 @@ class NoteDetailController: UIViewController {
             
         ]
         self.navigationItem.setRightBarButtonItems(topItems, animated: false)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        guard let newText = self.textView.text else { return }
+        guard let currentNote = self.note else { return createNewNote() }
+        var newNote = currentNote
+        newNote.text = newText
+        if let target = noteFolders[noteFolderIndex].notes.firstIndex(where: { (note) -> Bool in
+            return note == currentNote
+        }) {
+            noteFolders[noteFolderIndex].notes[target] = newNote
+        }
+    }
+    
+    fileprivate func createNewNote() {
+        guard let newText = self.textView.text else { return }
+        let newNote = Note(title: newText, date: Date(), text: newText)
+        noteFolders[noteFolderIndex].notes.append(newNote)
     }
     
     fileprivate func setupTextView() {
